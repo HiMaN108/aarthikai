@@ -6,6 +6,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -69,4 +70,36 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+@layer utilities {
+  
+  .gradient {
+    @apply bg-gradient-to-br from-yellow-500 to-amber-600;
+
+  }
+
+  .gradient-title {
+    @apply gradient font-extrabold tracking-tighter pr-2 pb-2 text-transparent bg-clip-text;
+  }
+}
+
+.hero-wrapper-image {
+  perspective: 800px; /* Enables 3D perspective */
+  perspective-origin: center; /* Optional: Adjusts vanishing point */
+  overflow: hidden; /* Ensures content stays within bounds */
+}
+
+.hero-image {
+  transform: rotateX(10deg) scale(1); /* More dramatic tilt to test */
+  transform-style: preserve-3d; /* Enables 3D rendering */
+  transition: transform 0.5s ease-out;
+  will-change: transform; /* Optimizes for smooth animations */
+  display: inline-block; /* Ensures image is treated as a block */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Adds depth */
+}
+
+.hero-image.scrolled {
+  transform: rotateX(0deg) scale(1) translateY(40px);
 }
