@@ -3,15 +3,22 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { serializeUseCacheCacheStore } from "next/dist/server/resume-data-cache/cache-store";
 
 const serializeTransaction = (obj) => {
     const serialized = { ...obj };
 
-    if(obj.amount){
+    if(obj.balance){
         serialized.balance = obj.balance.toNumber();
     }
-}
+    
+    if(obj.amount){
+        serialized.amount = obj.amount.toNumber();
+    }
+
+    return serialized;
+};
+
+
 
 export async function createAccount(data) {
 
@@ -78,4 +85,34 @@ export async function createAccount(data) {
             throw new Error(error.message);    
     }
     
+}
+
+export async function getUserAccounts(){
+
+    const { userId } = await auth();
+    
+    if(!userId) throw new Error("You must be logged in to perform this action");
+
+    const user = await  db.user.findUnique({
+        where : { clerkUserId : userId},
+    });
+
+    if(!user) {
+        throw new Error("user not found");
+    }
+
+    const accounts = await db.account.findMany({
+        where : {userId: user.id},
+        orderBy : {createdAt : "desc"},
+        include: {
+            _count : {
+                select :{
+                    transactions: true,
+                },
+            },
+        },
+    });
+
+    const serializedAccount = accounts.map(serializeTransaction)
+    return serializedAccount;
 }
